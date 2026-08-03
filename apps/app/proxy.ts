@@ -2,6 +2,10 @@ import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
+	if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+		return NextResponse.next();
+	}
+
 	const isSignedIn = getSessionCookie(request) !== null;
 	const isSignInPage = request.nextUrl.pathname === "/sign-in";
 
