@@ -10,6 +10,7 @@ import {
 	PageShellHeading,
 	PageShellTitle,
 } from "@/components/page-shell";
+import { DEMO_MODE } from "@/lib/demo-data";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -26,16 +27,18 @@ export default async function CompaniesPage({
 }: {
 	searchParams: Promise<SearchParams>;
 }) {
-	await requireSession();
-
 	const values = await companiesSearchParams.load(searchParams);
 
-	const trpc = getServerTrpc();
-	const queryClient = getServerQueryClient();
-	await queryClient.prefetchQuery(
-		trpc.companies.list.queryOptions(companiesSearchParams.toInput(values)),
-	);
-	void queryClient.prefetchQuery(trpc.users.list.queryOptions());
+	if (!DEMO_MODE) {
+		await requireSession();
+
+		const trpc = getServerTrpc();
+		const queryClient = getServerQueryClient();
+		await queryClient.prefetchQuery(
+			trpc.companies.list.queryOptions(companiesSearchParams.toInput(values)),
+		);
+		void queryClient.prefetchQuery(trpc.users.list.queryOptions());
+	}
 
 	return (
 		<PageShell className="min-h-0">
