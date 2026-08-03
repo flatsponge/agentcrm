@@ -6,7 +6,11 @@ import {
 	PageShellHeader,
 	PageShellHeading,
 } from "@/components/page-shell";
-import { DEMO_MODE } from "@/lib/demo-data";
+import {
+	DEMO_MODE,
+	demoDashboardSummary,
+	demoUser,
+} from "@/lib/demo-data";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -21,16 +25,19 @@ export default async function OverviewPage({
 	searchParams: Promise<SearchParams>;
 }) {
 	const { scope } = await loadOverviewSearchParams(searchParams);
+	const trpc = getServerTrpc();
+	const queryClient = getServerQueryClient();
+	const userQuery = trpc.users.me.queryOptions();
+	const dashboardQuery = trpc.dashboard.summary.queryOptions({ scope });
 
-	if (!DEMO_MODE) {
+	if (DEMO_MODE) {
+		queryClient.setQueryData(userQuery.queryKey, demoUser);
+		queryClient.setQueryData(dashboardQuery.queryKey, demoDashboardSummary);
+	} else {
 		await requireSession();
-
-		const trpc = getServerTrpc();
-		const queryClient = getServerQueryClient();
-
 		await Promise.all([
-			queryClient.prefetchQuery(trpc.users.me.queryOptions()),
-			queryClient.prefetchQuery(trpc.dashboard.summary.queryOptions({ scope })),
+			queryClient.prefetchQuery(userQuery),
+			queryClient.prefetchQuery(dashboardQuery),
 		]);
 	}
 
