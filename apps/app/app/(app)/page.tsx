@@ -6,6 +6,7 @@ import {
 	PageShellHeader,
 	PageShellHeading,
 } from "@/components/page-shell";
+import { DEMO_MODE } from "@/lib/demo-data";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -19,17 +20,19 @@ export default async function OverviewPage({
 }: {
 	searchParams: Promise<SearchParams>;
 }) {
-	await requireSession();
-
 	const { scope } = await loadOverviewSearchParams(searchParams);
 
-	const trpc = getServerTrpc();
-	const queryClient = getServerQueryClient();
+	if (!DEMO_MODE) {
+		await requireSession();
 
-	await Promise.all([
-		queryClient.prefetchQuery(trpc.users.me.queryOptions()),
-		queryClient.prefetchQuery(trpc.dashboard.summary.queryOptions({ scope })),
-	]);
+		const trpc = getServerTrpc();
+		const queryClient = getServerQueryClient();
+
+		await Promise.all([
+			queryClient.prefetchQuery(trpc.users.me.queryOptions()),
+			queryClient.prefetchQuery(trpc.dashboard.summary.queryOptions({ scope })),
+		]);
+	}
 
 	return (
 		<PageShell>
