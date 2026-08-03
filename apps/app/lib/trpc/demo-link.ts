@@ -15,7 +15,8 @@ export const demoLink: TRPCLink<AppRouter> = () => {
 					});
 					observer.complete();
 				} catch (cause) {
-					observer.error(TRPCClientError.from(cause));
+					const error = cause instanceof Error ? cause : new Error(String(cause));
+					observer.error(TRPCClientError.from(error));
 				}
 			});
 
