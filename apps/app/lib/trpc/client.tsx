@@ -10,6 +10,8 @@ import {
 import type { AppRouter } from "api/app-router";
 import type { FC, ReactNode } from "react";
 import { useState } from "react";
+import { DEMO_MODE } from "@/lib/demo-data";
+import { demoLink } from "./demo-link";
 import { getQueryClient } from "./query-client";
 
 const { TRPCProvider: ContextProvider, useTRPC: useTRPCContext } =
@@ -28,7 +30,7 @@ export function TRPCReactProvider({ children }: { children: ReactNode }) {
 	const queryClient = getQueryClient();
 	const [trpcClient] = useState(() =>
 		createTRPCClient<AppRouter>({
-			links: [httpBatchLink({ url: "/api/trpc" })],
+			links: DEMO_MODE ? [demoLink] : [httpBatchLink({ url: "/api/trpc" })],
 		}),
 	);
 

@@ -10,6 +10,12 @@ import {
 	PageShellHeading,
 	PageShellTitle,
 } from "@/components/page-shell";
+import {
+	DEMO_MODE,
+	demoCompanyOptions,
+	demoContactsList,
+	demoUsers,
+} from "@/lib/demo-data";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -26,19 +32,25 @@ export default async function ContactsPage({
 }: {
 	searchParams: Promise<SearchParams>;
 }) {
-	await requireSession();
-
 	const values = await contactsSearchParams.load(searchParams);
-
 	const trpc = getServerTrpc();
 	const queryClient = getServerQueryClient();
-	await queryClient.prefetchQuery(
-		trpc.contacts.list.queryOptions(contactsSearchParams.toInput(values)),
+	const contactsQuery = trpc.contacts.list.queryOptions(
+		contactsSearchParams.toInput(values),
 	);
-	void queryClient.prefetchQuery(trpc.users.list.queryOptions());
-	void queryClient.prefetchQuery(
-		trpc.companies.options.queryOptions({ q: "" }),
-	);
+	const usersQuery = trpc.users.list.queryOptions();
+	const companiesQuery = trpc.companies.options.queryOptions({ q: "" });
+
+	if (DEMO_MODE) {
+		queryClient.setQueryData(contactsQuery.queryKey, demoContactsList as never);
+		queryClient.setQueryData(usersQuery.queryKey, demoUsers as never);
+		queryClient.setQueryData(companiesQuery.queryKey, demoCompanyOptions as never);
+	} else {
+		await requireSession();
+		await queryClient.prefetchQuery(contactsQuery);
+		void queryClient.prefetchQuery(usersQuery);
+		void queryClient.prefetchQuery(companiesQuery);
+	}
 
 	return (
 		<PageShell className="min-h-0">

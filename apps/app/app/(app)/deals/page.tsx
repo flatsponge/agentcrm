@@ -10,6 +10,12 @@ import {
 	PageShellHeading,
 	PageShellTitle,
 } from "@/components/page-shell";
+import {
+	DEMO_MODE,
+	demoCompanyOptions,
+	demoDealsList,
+	demoUsers,
+} from "@/lib/demo-data";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -26,19 +32,25 @@ export default async function DealsPage({
 }: {
 	searchParams: Promise<SearchParams>;
 }) {
-	await requireSession();
-
 	const values = await dealsSearchParams.load(searchParams);
-
 	const trpc = getServerTrpc();
 	const queryClient = getServerQueryClient();
-	await queryClient.prefetchQuery(
-		trpc.deals.list.queryOptions(dealsSearchParams.toInput(values)),
+	const dealsQuery = trpc.deals.list.queryOptions(
+		dealsSearchParams.toInput(values),
 	);
-	void queryClient.prefetchQuery(trpc.users.list.queryOptions());
-	void queryClient.prefetchQuery(
-		trpc.companies.options.queryOptions({ q: "" }),
-	);
+	const usersQuery = trpc.users.list.queryOptions();
+	const companiesQuery = trpc.companies.options.queryOptions({ q: "" });
+
+	if (DEMO_MODE) {
+		queryClient.setQueryData(dealsQuery.queryKey, demoDealsList as never);
+		queryClient.setQueryData(usersQuery.queryKey, demoUsers as never);
+		queryClient.setQueryData(companiesQuery.queryKey, demoCompanyOptions as never);
+	} else {
+		await requireSession();
+		await queryClient.prefetchQuery(dealsQuery);
+		void queryClient.prefetchQuery(usersQuery);
+		void queryClient.prefetchQuery(companiesQuery);
+	}
 
 	return (
 		<PageShell className="min-h-0">

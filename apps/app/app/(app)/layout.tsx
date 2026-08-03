@@ -3,6 +3,7 @@ import { AppIconRail } from "@/components/app-icon-rail";
 import { QuickSwitcher } from "@/components/crm/quick-switcher";
 import { RecordSheetHost } from "@/components/crm/record-sheet/record-sheet-host";
 import { MobileNavProvider } from "@/components/mobile-nav";
+import { DEMO_MODE, demoUser } from "@/lib/demo-data";
 import { requireGoogleAccess } from "@/lib/session";
 
 export default async function AppLayout({
@@ -10,7 +11,7 @@ export default async function AppLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { user } = await requireGoogleAccess();
+	const user = DEMO_MODE ? demoUser : (await requireGoogleAccess()).user;
 
 	return (
 		<MobileNavProvider>
@@ -27,9 +28,8 @@ export default async function AppLayout({
 					{children}
 				</div>
 
-				<RecordSheetHost />
-
-				<QuickSwitcher />
+				{DEMO_MODE ? null : <RecordSheetHost />}
+				{DEMO_MODE ? null : <QuickSwitcher />}
 			</div>
 		</MobileNavProvider>
 	);
