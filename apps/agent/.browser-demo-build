@@ -1,2 +1,2 @@
 This project root builds apps/app in browser-only demo mode via the repository vercel.json.
-Build revision: demo session proxy and inert runtime auth configuration.
+Build revision: server-hydrated original dashboard and tables.
