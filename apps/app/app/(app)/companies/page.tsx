@@ -10,7 +10,11 @@ import {
 	PageShellHeading,
 	PageShellTitle,
 } from "@/components/page-shell";
-import { DEMO_MODE } from "@/lib/demo-data";
+import {
+	DEMO_MODE,
+	demoCompaniesList,
+	demoUsers,
+} from "@/lib/demo-data";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
@@ -28,16 +32,20 @@ export default async function CompaniesPage({
 	searchParams: Promise<SearchParams>;
 }) {
 	const values = await companiesSearchParams.load(searchParams);
+	const trpc = getServerTrpc();
+	const queryClient = getServerQueryClient();
+	const companiesQuery = trpc.companies.list.queryOptions(
+		companiesSearchParams.toInput(values),
+	);
+	const usersQuery = trpc.users.list.queryOptions();
 
-	if (!DEMO_MODE) {
+	if (DEMO_MODE) {
+		queryClient.setQueryData(companiesQuery.queryKey, demoCompaniesList);
+		queryClient.setQueryData(usersQuery.queryKey, demoUsers);
+	} else {
 		await requireSession();
-
-		const trpc = getServerTrpc();
-		const queryClient = getServerQueryClient();
-		await queryClient.prefetchQuery(
-			trpc.companies.list.queryOptions(companiesSearchParams.toInput(values)),
-		);
-		void queryClient.prefetchQuery(trpc.users.list.queryOptions());
+		await queryClient.prefetchQuery(companiesQuery);
+		void queryClient.prefetchQuery(usersQuery);
 	}
 
 	return (
