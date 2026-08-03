@@ -42,9 +42,9 @@ export default async function DealsPage({
 	const companiesQuery = trpc.companies.options.queryOptions({ q: "" });
 
 	if (DEMO_MODE) {
-		queryClient.setQueryData(dealsQuery.queryKey, demoDealsList);
-		queryClient.setQueryData(usersQuery.queryKey, demoUsers);
-		queryClient.setQueryData(companiesQuery.queryKey, demoCompanyOptions);
+		queryClient.setQueryData(dealsQuery.queryKey, demoDealsList as never);
+		queryClient.setQueryData(usersQuery.queryKey, demoUsers as never);
+		queryClient.setQueryData(companiesQuery.queryKey, demoCompanyOptions as never);
 	} else {
 		await requireSession();
 		await queryClient.prefetchQuery(dealsQuery);
