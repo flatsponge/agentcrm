@@ -31,8 +31,11 @@ export default async function OverviewPage({
 	const dashboardQuery = trpc.dashboard.summary.queryOptions({ scope });
 
 	if (DEMO_MODE) {
-		queryClient.setQueryData(userQuery.queryKey, demoUser);
-		queryClient.setQueryData(dashboardQuery.queryKey, demoDashboardSummary);
+		queryClient.setQueryData(userQuery.queryKey, demoUser as never);
+		queryClient.setQueryData(dashboardQuery.queryKey, {
+			...demoDashboardSummary,
+			scope,
+		} as never);
 	} else {
 		await requireSession();
 		await Promise.all([
