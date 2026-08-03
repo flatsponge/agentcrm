@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "cd demo && bun install",
-  "buildCommand": "cd demo && bun run build",
-  "outputDirectory": "demo/out"
+  "installCommand": "cd ../../demo && bun install",
+  "buildCommand": "cd ../../demo && bun run build && rm -rf ../apps/agent/demo-out && cp -R out ../apps/agent/demo-out",
+  "outputDirectory": "demo-out"
 }
