@@ -42,9 +42,9 @@ export default async function ContactsPage({
 	const companiesQuery = trpc.companies.options.queryOptions({ q: "" });
 
 	if (DEMO_MODE) {
-		queryClient.setQueryData(contactsQuery.queryKey, demoContactsList);
-		queryClient.setQueryData(usersQuery.queryKey, demoUsers);
-		queryClient.setQueryData(companiesQuery.queryKey, demoCompanyOptions);
+		queryClient.setQueryData(contactsQuery.queryKey, demoContactsList as never);
+		queryClient.setQueryData(usersQuery.queryKey, demoUsers as never);
+		queryClient.setQueryData(companiesQuery.queryKey, demoCompanyOptions as never);
 	} else {
 		await requireSession();
 		await queryClient.prefetchQuery(contactsQuery);
