@@ -40,8 +40,8 @@ export default async function CompaniesPage({
 	const usersQuery = trpc.users.list.queryOptions();
 
 	if (DEMO_MODE) {
-		queryClient.setQueryData(companiesQuery.queryKey, demoCompaniesList);
-		queryClient.setQueryData(usersQuery.queryKey, demoUsers);
+		queryClient.setQueryData(companiesQuery.queryKey, demoCompaniesList as never);
+		queryClient.setQueryData(usersQuery.queryKey, demoUsers as never);
 	} else {
 		await requireSession();
 		await queryClient.prefetchQuery(companiesQuery);
