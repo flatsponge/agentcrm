@@ -1,4 +1,4 @@
-import type { TRPCLink } from "@trpc/client";
+import { TRPCClientError, type TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
 import type { AppRouter } from "api/app-router";
 import { resolveDemoTrpc } from "@/lib/demo-data";
@@ -14,8 +14,8 @@ export const demoLink: TRPCLink<AppRouter> = () => {
 						},
 					});
 					observer.complete();
-				} catch (error) {
-					observer.error(error);
+				} catch (cause) {
+					observer.error(TRPCClientError.from(cause));
 				}
 			});
 
