@@ -1,2 +1,2 @@
 This project root builds apps/app in browser-only demo mode via the repository vercel.json.
-Build revision: server-hydrated original dashboard and tables.
+Build revision: server-hydrated original dashboard, companies, contacts, and deals.
